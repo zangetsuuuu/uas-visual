@@ -30,11 +30,13 @@ public class EditRecipeDialog extends JDialog {
     private JButton cancelButton;
     private RecipeService recipeController;
     private int recipeId;
+    private int userId;
 
-    public EditRecipeDialog(Frame parent, int recipeId, String recipeName, String ingredients, String instructions, RecipeService recipeController) {
+    public EditRecipeDialog(Frame parent, int recipeId, String recipeName, String ingredients, String instructions, RecipeService recipeController, int userId) {
         super(parent, "Edit Resep", true);
         this.recipeId = recipeId;
         this.recipeController = recipeController;
+        this.userId = userId;
         setSize(500, 500);
         setLocationRelativeTo(parent);
 
@@ -172,7 +174,7 @@ public class EditRecipeDialog extends JDialog {
                 }
 
                 // Memanggil metode updateRecipe dengan parameter yang sudah diubah
-                recipeController.updateRecipe(recipeId, recipeName, ingredientsList, instructionsList);
+                recipeController.updateRecipe(recipeId, recipeName, ingredientsList, instructionsList, userId);
                 JOptionPane.showMessageDialog(EditRecipeDialog.this, "Resep berhasil diperbarui!");
                 dispose();
             }

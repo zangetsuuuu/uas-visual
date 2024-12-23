@@ -25,18 +25,19 @@ public class RecipeService {
 
     private Map<Integer, String> recipeInstructions = new HashMap<>();
 
-    public void loadRecipes(DefaultTableModel model) {
+    public void loadRecipes(DefaultTableModel model, int userId) {
         try (Connection connection = DBConnection.getConnection()) {
             model.setRowCount(0);
             String query = "SELECT r.id, r.name, GROUP_CONCAT(i.name SEPARATOR ', ') AS ingredients, r.created_at "
                     + "FROM recipes r "
                     + "LEFT JOIN ingredients i ON r.id = i.recipe_id "
+                    + "WHERE r.user_id = ? "
                     + "GROUP BY r.id, r.name, r.created_at";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             int num = 1;
-
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
@@ -109,13 +110,14 @@ public class RecipeService {
         }
     }
 
-    public void addRecipe(String name, String ingredients, String[] instructions) {
+    public void addRecipe(String name, String ingredients, String[] instructions, int userId) {
         try (Connection connection = DBConnection.getConnection()) {
             connection.setAutoCommit(false);
 
-            String recipeQuery = "INSERT INTO recipes (name) VALUES (?)";
+            String recipeQuery = "INSERT INTO recipes (name, user_id) VALUES (?, ?)";
             PreparedStatement recipeStatement = connection.prepareStatement(recipeQuery, Statement.RETURN_GENERATED_KEYS);
             recipeStatement.setString(1, name);
+            recipeStatement.setInt(2, userId);  // Menyertakan ID pengguna
             recipeStatement.executeUpdate();
 
             ResultSet generatedKeys = recipeStatement.getGeneratedKeys();
@@ -131,7 +133,6 @@ public class RecipeService {
                 }
             }
 
-            // Menambahkan instruksi jika ada
             if (recipeId != -1 && instructions != null && instructions.length > 0) {
                 for (String instruction : instructions) {
                     addInstructionToRecipe(recipeId, instruction.trim(), connection);
@@ -173,26 +174,34 @@ public class RecipeService {
         }
     }
 
-    public void updateRecipe(int recipeId, String newName, List<String> newIngredients, List<String> newInstructions) {
+    public void updateRecipe(int recipeId, String newName, List<String> newIngredients, List<String> newInstructions, int userId) {
         try (Connection connection = DBConnection.getConnection()) {
             connection.setAutoCommit(false);
 
-            // Update nama resep
-            String updateRecipeQuery = "UPDATE recipes SET name = ? WHERE id = ?";
-            try (PreparedStatement updateRecipeStmt = connection.prepareStatement(updateRecipeQuery)) {
-                updateRecipeStmt.setString(1, newName);
-                updateRecipeStmt.setInt(2, recipeId);
-                updateRecipeStmt.executeUpdate();
+            // Pastikan resep yang ingin diperbarui adalah milik pengguna yang sedang login
+            String checkUserQuery = "SELECT user_id FROM recipes WHERE id = ?";
+            PreparedStatement checkUserStmt = connection.prepareStatement(checkUserQuery);
+            checkUserStmt.setInt(1, recipeId);
+            ResultSet resultSet = checkUserStmt.executeQuery();
+            if (resultSet.next() && resultSet.getInt("user_id") == userId) {
+                // Update nama resep
+                String updateRecipeQuery = "UPDATE recipes SET name = ? WHERE id = ?";
+                try (PreparedStatement updateRecipeStmt = connection.prepareStatement(updateRecipeQuery)) {
+                    updateRecipeStmt.setString(1, newName);
+                    updateRecipeStmt.setInt(2, recipeId);
+                    updateRecipeStmt.executeUpdate();
+                }
+
+                // Update bahan-bahan
+                updateIngredients(connection, recipeId, newIngredients);
+
+                // Update instruksi
+                updateInstructions(connection, recipeId, newInstructions);
+
+                connection.commit();
+            } else {
+                System.out.println("User tidak memiliki akses untuk memperbarui resep ini.");
             }
-
-            // Update bahan-bahan
-            updateIngredients(connection, recipeId, newIngredients);
-
-            // Update petunjuk
-            updateInstructions(connection, recipeId, newInstructions);
-
-            // Commit transaksi jika semua update berhasil
-            connection.commit();
         } catch (Exception e) {
             e.printStackTrace();
             try (Connection connection = DBConnection.getConnection()) {

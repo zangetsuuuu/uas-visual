@@ -5,8 +5,9 @@
 package view;
 
 import javax.swing.JOptionPane;
-import service.RecipeService;
 import javax.swing.table.DefaultTableModel;
+import service.RecipeService;
+import forms.LoginForm;
 
 /**
  *
@@ -15,14 +16,16 @@ import javax.swing.table.DefaultTableModel;
 public class MainFrame extends javax.swing.JFrame {
 
     private RecipeService recipeController;
+    private int currentUserId;
 
     /**
      * Creates new form MainFrame
      */
-    public MainFrame() {
+    public MainFrame(int userId) {
+        this.currentUserId = userId;
         initComponents();
         recipeController = new RecipeService();
-        recipeController.loadRecipes((DefaultTableModel) recipeTable.getModel());
+        recipeController.loadRecipes((DefaultTableModel) recipeTable.getModel(), currentUserId);
     }
 
     /**
@@ -43,12 +46,17 @@ public class MainFrame extends javax.swing.JFrame {
         addRecipeBtn = new javax.swing.JButton();
         searchTF = new javax.swing.JTextField();
         searchBtn = new javax.swing.JButton();
+        menuBar = new javax.swing.JMenuBar();
+        fileMenu = new javax.swing.JMenu();
+        menuItem1 = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        logoutMenu = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         mainPanel.setBackground(new java.awt.Color(255, 255, 255));
 
-        mainTitle.setFont(new java.awt.Font("Segoe UI", 0, 20)); // NOI18N
+        mainTitle.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         mainTitle.setText("Daftar Resep Makanan");
         mainTitle.setToolTipText("");
 
@@ -134,12 +142,9 @@ public class MainFrame extends javax.swing.JFrame {
                             .addGroup(mainPanelLayout.createSequentialGroup()
                                 .addComponent(addRecipeBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(refreshBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(mainTitle)
-                                .addGap(80, 80, 80)))
+                                .addComponent(refreshBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(mainTitle))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(mainPanelLayout.createSequentialGroup()
                                 .addComponent(searchTF, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -151,11 +156,11 @@ public class MainFrame extends javax.swing.JFrame {
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(mainPanelLayout.createSequentialGroup()
-                .addGap(32, 32, 32)
+                .addGap(29, 29, 29)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(mainTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(exitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(searchTF, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(searchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -166,6 +171,34 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(28, 28, 28))
         );
 
+        menuBar.setBackground(new java.awt.Color(204, 204, 204));
+
+        fileMenu.setText("File");
+
+        menuItem1.setText("Tambah Resep");
+        menuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem1ActionPerformed(evt);
+            }
+        });
+        fileMenu.add(menuItem1);
+
+        menuBar.add(fileMenu);
+
+        jMenu1.setText("Akun");
+
+        logoutMenu.setText("Logout");
+        logoutMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logoutMenuActionPerformed(evt);
+            }
+        });
+        jMenu1.add(logoutMenu);
+
+        menuBar.add(jMenu1);
+
+        setJMenuBar(menuBar);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -174,9 +207,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -192,7 +223,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void refreshBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshBtnActionPerformed
         DefaultTableModel model = (DefaultTableModel) recipeTable.getModel();
-        recipeController.loadRecipes(model);
+        recipeController.loadRecipes(model, currentUserId);
     }//GEN-LAST:event_refreshBtnActionPerformed
 
     private void recipeTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_recipeTableMouseClicked
@@ -204,13 +235,13 @@ public class MainFrame extends javax.swing.JFrame {
 
             String instructions = recipeController.getInstructions(recipeId);
 
-            RecipeDetailDialog dialog = new RecipeDetailDialog(this, recipeId, recipeName, ingredients, instructions, recipeController);
+            RecipeDetailDialog dialog = new RecipeDetailDialog(this, recipeId, recipeName, ingredients, instructions, recipeController, currentUserId);
             dialog.setVisible(true);
         }
     }//GEN-LAST:event_recipeTableMouseClicked
 
     private void addRecipeBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRecipeBtnActionPerformed
-        AddRecipeDialog addRecipeDialog = new AddRecipeDialog(this, recipeController);
+        AddRecipeDialog addRecipeDialog = new AddRecipeDialog(this, recipeController, currentUserId);
         addRecipeDialog.setVisible(true);
     }//GEN-LAST:event_addRecipeBtnActionPerformed
 
@@ -220,6 +251,20 @@ public class MainFrame extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) recipeTable.getModel();
         recipeController.searchRecipe(model, searchKeyword);
     }//GEN-LAST:event_searchBtnActionPerformed
+
+    private void menuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem1ActionPerformed
+        AddRecipeDialog addRecipeDialog = new AddRecipeDialog(this, recipeController, currentUserId);
+        addRecipeDialog.setVisible(true);
+    }//GEN-LAST:event_menuItem1ActionPerformed
+
+    private void logoutMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutMenuActionPerformed
+        int result = JOptionPane.showConfirmDialog(this, "Apakah Anda yakin ingin logout?", "Konfirmasi Logout", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+        if (result == JOptionPane.YES_OPTION) {
+            this.dispose();
+            new LoginForm().setVisible(true);
+        }
+    }//GEN-LAST:event_logoutMenuActionPerformed
 
     /**
      * @param args the command line arguments
@@ -251,7 +296,7 @@ public class MainFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainFrame().setVisible(true);
+                new LoginForm().setVisible(true);
             }
         });
     }
@@ -259,9 +304,14 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addRecipeBtn;
     private javax.swing.JButton exitBtn;
+    private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JMenuItem logoutMenu;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JLabel mainTitle;
+    private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenuItem menuItem1;
     private javax.swing.JTable recipeTable;
     private javax.swing.JButton refreshBtn;
     private javax.swing.JButton searchBtn;

@@ -3,8 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/rafif/OneDrive/Documents/NetBeansProjects/RecipeManagement/src/forms/RegisterForm.java</file>
+            <file>file:/C:/Users/rafif/OneDrive/Documents/NetBeansProjects/RecipeManagement/src/forms/LoginForm.java</file>
+            <file>file:/C:/Users/rafif/OneDrive/Documents/NetBeansProjects/RecipeManagement/src/config/DBConnection.java</file>
             <file>file:/C:/Users/rafif/OneDrive/Documents/NetBeansProjects/RecipeManagement/src/view/AddRecipeDialog.java</file>
             <file>file:/C:/Users/rafif/OneDrive/Documents/NetBeansProjects/RecipeManagement/src/view/RecipeDetailDialog.java</file>
+            <file>file:/C:/Users/rafif/OneDrive/Documents/NetBeansProjects/RecipeManagement/src/service/AuthService.java</file>
             <file>file:/C:/Users/rafif/OneDrive/Documents/NetBeansProjects/RecipeManagement/src/view/MainFrame.java</file>
             <file>file:/C:/Users/rafif/OneDrive/Documents/NetBeansProjects/RecipeManagement/src/view/EditRecipeDialog.java</file>
             <file>file:/C:/Users/rafif/OneDrive/Documents/NetBeansProjects/RecipeManagement/src/service/RecipeService.java</file>

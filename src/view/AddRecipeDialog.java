@@ -27,10 +27,12 @@ public class AddRecipeDialog extends JDialog {
     private JButton saveButton;
     private JButton cancelButton;
     private RecipeService recipeController;
+    private int userId;
 
-    public AddRecipeDialog(Frame parent, RecipeService recipeController) {
+    public AddRecipeDialog(Frame parent, RecipeService recipeController, int userId) {
         super(parent, "Tambah Resep Baru", true);
         this.recipeController = recipeController;
+        this.userId = userId;
         setSize(500, 500);
         setLocationRelativeTo(parent);
 
@@ -142,7 +144,7 @@ public class AddRecipeDialog extends JDialog {
                     instructions[i] = instructionsListModel.get(i);
                 }
 
-                recipeController.addRecipe(recipeName, ingredients.toString(), instructions);
+                recipeController.addRecipe(recipeName, ingredients.toString(), instructions, userId);
 
                 JOptionPane.showMessageDialog(AddRecipeDialog.this, "Resep berhasil disimpan!");
                 dispose();

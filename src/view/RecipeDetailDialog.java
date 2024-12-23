@@ -17,7 +17,7 @@ public class RecipeDetailDialog extends JDialog {
     private final RecipeService recipeController;
     private final int recipeId;
 
-    public RecipeDetailDialog(Frame parent, int recipeId, String recipeName, String ingredients, String instructions, RecipeService recipeController) {
+    public RecipeDetailDialog(Frame parent, int recipeId, String recipeName, String ingredients, String instructions, RecipeService recipeController, int userId) {
         super(parent, "Detail Resep", true);
         this.recipeId = recipeId;
         this.recipeController = recipeController;
@@ -76,8 +76,8 @@ public class RecipeDetailDialog extends JDialog {
 
         // Tambahkan aksi untuk tombol "Edit"
         editButton.addActionListener(e -> {
-            MainFrame mainFrame = new MainFrame();
-            EditRecipeDialog editDialog = new EditRecipeDialog(mainFrame, recipeId, recipeName, ingredients, instructions, recipeController);
+            MainFrame mainFrame = new MainFrame(userId);
+            EditRecipeDialog editDialog = new EditRecipeDialog(mainFrame, recipeId, recipeName, ingredients, instructions, recipeController, userId);
             editDialog.setVisible(true);
             dispose(); // Tutup dialog detail setelah pengeditan
         });
